@@ -7,9 +7,9 @@ find exactly what they need.
 
 Use topic modeling (NMF), we create an app that allowers users to quickly locate the most similar Tedx talks   
 based on contents. The workflow is as follows:  
-1. Scrape transcripts of Ted and Tedx talks from youtube and Ted idea blogs from Ted.com.
-2. Use NMF to assign topic socres.
-3. Calculate similarity and make recommendations. 
+1. Scrape transcripts of Ted and Tedx talks from youtube and Ted idea blogs from Ted.com.   
+2. Use NMF to assign topic socres.   
+3. Calculate similarity and make recommendations.    
 
 Code for step 1 - scraping is included in scripts.  
 Code for step 2 is included in jupyter_notebooks.       
