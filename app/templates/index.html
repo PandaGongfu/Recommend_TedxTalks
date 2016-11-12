@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <meta charset="utf-8">
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+
+    <meta HTTP-EQUIV="X-UA-COMPATIBLE" CONTENT="IE=EmulateIE9" >
+
+    <script type="text/javascript" src="{{url_for('static',filename="d3.min.js")}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename="autocomplete.js")}}"></script>
+
+    <link rel="stylesheet" href="{{url_for('static',filename="bariol.css")}}"/>
+    <link rel="stylesheet" href="{{url_for('static',filename="style.css")}}"/>
+    <style>
+      .bar {
+       fill: white;
+     }
+     </style>
+  </head>
+
+
+  <body>  
+    <div class="container">
+      <div class="header">
+        <h1 style="font-size: 300%;text-align:center;color:white;background-color:royalblue">Ted Talk Recommender</h1>
+      </div>
+      <hr/>
+    </div>  
+
+    <div id="chart_area" class="wrapper">
+      <h1 class="text-muted" style="font-size: 200%;text-align:center">  Tedx Talks you may also enjoy</h1>
+      <p class="space"></p>
+      <div id="bar_chart" align="center"></div>
+      <div id="bar_chart2" align="center"></div>
+      <div id="bar_chart3" align="center"></div>
+
+      <h1 class="text-muted" style="font-size: 200%;text-align:center">  Ted blogs that may inspire you</h1>
+      <div id="bar_chart_b" align="center"></div>
+      <div id="bar_chart_b2" align="center"></div>
+    </div>
+
+    <div class="header">
+    <h1 style="font-size: 200%;color:white;background-color:skyblue;text-align:center;">Find the Ted Talk that you've enjoyed</h1>
+    </div>
+
+    <div id="test" style="width:100%; height:300%;"></div>
+
+    <script language="JavaScript">
+      //Variable to hold autocomplete options
+      var keys;
+
+      //Load US States as options from CSV - but this can also be created dynamically
+      d3.csv("{{url_for('static',filename="clean_titles.csv")}}",function (csv) {
+          keys=csv;
+          start();
+      });
+
+
+      //Call back for when user selects an option
+      function onSelect(d) {
+          var test = JSON.stringify({
+        example: d.title
+      });
+
+         $.ajax({
+         type: "POST",
+         contentType: "application/json; charset=utf-8",
+         url: "/recommend/",
+         dataType: "json",
+         async: true,
+         data: test,
+         success: function (data) {
+           var tedx = data["recommend_tedx"];
+           var blogs = data["recommend_blog"];
+           d3.select("#percent_text")
+             .attr("x", 400)
+             .text(tedx[0]);
+           d3.select("#percent_text2")
+             .attr("x", 400)
+             .text(tedx[1]);
+           d3.select("#percent_text3")
+             .attr("x", 400)
+             .text(tedx[2]);
+           d3.select("#percent_text_b")
+             .attr("x", 400)
+             .text(blogs[0]);
+           d3.select("#percent_text_b2")
+             .attr("x", 400)
+             .text(blogs[1]);
+         },
+         error: function (result) {
+         }
+       })
+
+      }
+
+      //Setup and render the autocomplete
+      function start() {
+          var mc = autocomplete(document.getElementById('test'))
+                  .keys(keys)
+                  .dataField("title")
+                  .placeHolder("Search Ted Talks - Start typing here")
+                  .width(960)
+                  .height(500)
+                  .onSelected(onSelect)
+                  .render();
+      }
+
+// set bars
+
+     var chart = d3.select("#bar_chart")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 50);
+
+     var bar = chart.append("g")
+                    .attr("class", "bar")
+
+     bar.append("svg:rect")
+          .attr("id", "chancebar")
+          .attr("class", "bar")
+          .attr("width", 800)
+          .attr("height", 50);
+
+     bar.append("text")
+        .attr("id", "percent_text")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", 500)
+        .attr("text-anchor", "middle")
+        .attr("fill", "royalblue")
+        .attr("font-size", 20)
+        .text( "");
+
+// bar2
+     var chart = d3.select("#bar_chart2")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 50);
+
+     var bar = chart.append("g")
+                    .attr("class", "bar")
+
+       bar.append("svg:rect")
+          .attr("id", "chancebar2")
+          .attr("class", "bar")
+          .attr("width", 800)
+          .attr("height", 50);
+
+     bar.append("text")
+        .attr("id", "percent_text2")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", 500)
+        .attr("text-anchor", "middle")
+        .attr("fill", "royalblue")
+        .attr("font-size", 20)
+        .text( "");
+// bar3
+     var chart = d3.select("#bar_chart3")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 50);
+
+     var bar = chart.append("g")
+                    .attr("class", "bar")
+
+       bar.append("svg:rect")
+          .attr("id", "chancebar3")
+          .attr("class", "bar")
+          .attr("width", 800)
+          .attr("height", 50);
+
+     bar.append("text")
+        .attr("id", "percent_text3")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", 500)
+        .attr("text-anchor", "middle")
+        .attr("fill", "royalblue")
+        .attr("font-size", 20)
+        .text( "");
+
+// bar_b
+     var chart = d3.select("#bar_chart_b")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 50);
+
+     var bar = chart.append("g")
+                    .attr("class", "bar")
+
+       bar.append("svg:rect")
+          .attr("id", "chancebar_b")
+          .attr("class", "bar")
+          .attr("width", 800)
+          .attr("height", 50);
+
+     bar.append("text")
+        .attr("id", "percent_text_b")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", 500)
+        .attr("text-anchor", "middle")
+        .attr("fill", "royalblue")
+        .attr("font-size", 20)
+        .text( "");
+
+
+// bar_b2
+     var chart = d3.select("#bar_chart_b2")
+                   .append("svg:svg")
+                   .attr("width", 800)
+                   .attr("height", 50);
+
+     var bar = chart.append("g")
+                    .attr("class", "bar")
+
+       bar.append("svg:rect")
+          .attr("id", "chancebar_b2")
+          .attr("class", "bar")
+          .attr("width", 800)
+          .attr("height", 50);
+
+     bar.append("text")
+        .attr("id", "percent_text_b2")
+        .attr("dy", ".75em")
+        .attr("y", 15)
+        .attr("x", 500)
+        .attr("text-anchor", "middle")
+        .attr("fill", "royalblue")
+        .attr("font-size", 20)
+        .text( "");
+
+    </script>
+    </div>
+
+  </body>
+
+</html>
