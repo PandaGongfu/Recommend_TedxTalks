@@ -13,4 +13,6 @@ based on contents. The workflow is as follows:
 
 Code for step 1 - scraping is included in scripts.  
 Code for step 2 is included in jupyter_notebooks.       
-Code for step 3 is included in app.      
+Code for step 3 is included in app.  
+
+![screenshot](images/ted_app.png)
