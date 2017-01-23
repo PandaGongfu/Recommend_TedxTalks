@@ -34,6 +34,15 @@
       <hr/>
     </div>  
 
+    <div id="mv_tiles" align="center">
+      <a class="mv-tile" href="http://www.google.com/" title="Google Search">
+        <div class="mv-thumb">
+          <img id = "word_cloud" width="500" height="500" >
+
+        </div>
+      </a>
+    </div>
+
     <div id="chart_area" class="wrapper">
       <h1 class="text-muted" style="font-size: 200%;text-align:center">  Tedx Talks you may also enjoy</h1>
       <p class="space"></p>
@@ -56,7 +65,7 @@
       //Variable to hold autocomplete options
       var keys;
 
-      //Load US States as options from CSV - but this can also be created dynamically
+      //Load all TED/TEDX titles - but this can also be created dynamically
       d3.csv("{{url_for('static',filename="clean_titles.csv")}}",function (csv) {
           keys=csv;
           start();
@@ -68,7 +77,6 @@
           var test = JSON.stringify({
         example: d.title
       });
-
          $.ajax({
          type: "POST",
          contentType: "application/json; charset=utf-8",
@@ -79,6 +87,7 @@
          success: function (data) {
            var tedx = data["recommend_tedx"];
            var blogs = data["recommend_blog"];
+           var img_name = data["img"];
            d3.select("#percent_text")
              .attr("x", 400)
              .text(tedx[0]);
@@ -94,6 +103,11 @@
            d3.select("#percent_text_b2")
              .attr("x", 400)
              .text(blogs[1]);
+
+           var eventDataBaseUrl = "{{ url_for('send_image', filename='DUMMY_VALUE') }}"; 
+           var actualDataUrl = eventDataBaseUrl.replace(/DUMMY_VALUE/, String(img_name)); 
+           $('#word_cloud').attr('src', actualDataUrl)
+
          },
          error: function (result) {
          }

@@ -4,18 +4,73 @@ import os
 # will be used to redirect the user once the upload is done
 # and send_from_directory will help us to send/show on the
 # browser the file that the user just uploaded
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import numpy as np
 from annoy import AnnoyIndex
 import random
 import pickle
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time 
+import shutil
+import glob
+
+def wordcloud(index):
+    all_texts = pickle.load(open('models/all_lemma.pickle', 'rb'))
+
+    chromedriver = "/Users/PandaGongfu/Downloads/chromedriver_2"
+    os.environ["webdriver.chrome.driver"] = chromedriver
+    driver = webdriver.Chrome(chromedriver)
+    driver.get('https://www.jasondavies.com/wordcloud/')
+
+    textbox_xpath = "//textarea[@id='text']"
+    textbox = driver.find_elements_by_xpath(textbox_xpath)[0]
+    textbox.clear()
+    textbox.send_keys(' '.join(all_texts[index]))
+
+    time.sleep(5)
+    go_xpath = "//button[@id='go']"
+    go_button = driver.find_elements_by_xpath(go_xpath)[0]
+    go_button.click()
+
+    time.sleep(2)
+    svg_xpath = "//button[@id='download-svg']"
+    svg_button = driver.find_elements_by_xpath(svg_xpath)[0]
+    svg_button.click()
+
+    time.sleep(2)
+    download_svg = '/Users/PandaGongfu/Downloads/wordcloud.svg'
+    temp_svg = 'wordcloud.svg'
+    shutil.copyfile(download_svg, temp_svg)
+    os.remove(download_svg)
+
+    os.system('qlmanage -t -s 500 -o . wordcloud.svg')
+    png_file = 'wordcloud.svg.png'
+
+    existing_files = glob.glob('static/*.png')
+    dst_file = 'images/word_cloud_' + '{:03d}'.format(int(existing_files[-1][-7:-4])+1) + '.png'
+
+    shutil.copyfile(png_file, dst_file)
+    os.remove(png_file)
+    os.remove(temp_svg)
+
+    return dst_file
 
 # Initialize the Flask application
 app = Flask(__name__)
 
+# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # dst_file = wordcloud()
+    # filename = os.path.join(APP_ROOT, 'images/word_cloud_2.png')
+    # dst_file = 'word_cloud.png'
+    return render_template('index_update.html')
+
+@app.route('/<filename>')
+def send_image(filename):
+    return send_from_directory("images", filename)
 
 @app.route("/recommend/", methods=["POST"])
 def recommend():
@@ -42,6 +97,8 @@ def recommend():
     clean_titles = [t[5:] for t in all_titles]
 
     title_id = clean_titles.index(title)
+
+    dst_file = wordcloud(title_id)
     idx = t.get_nns_by_item(title_id, 1000)
 
     tedx_list = []
@@ -62,7 +119,8 @@ def recommend():
 
     # Put the result in a nice dict so we can send it as json
     results = {"recommend_tedx": tedx_list,
-               "recommend_blog": blog_list}
+               "recommend_blog": blog_list,
+               "img": dst_file.split('/')[1]}
              
     return jsonify(results)
 
