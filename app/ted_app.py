@@ -66,7 +66,7 @@ def index():
     # dst_file = wordcloud()
     # filename = os.path.join(APP_ROOT, 'images/word_cloud_2.png')
     # dst_file = 'word_cloud.png'
-    return render_template('index_update.html')
+    return render_template('index.html')
 
 @app.route('/<filename>')
 def send_image(filename):
