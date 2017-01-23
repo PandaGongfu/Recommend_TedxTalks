@@ -59,13 +59,9 @@ def wordcloud(index):
 # Initialize the Flask application
 app = Flask(__name__)
 
-# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 @app.route('/')
 def index():
-    # dst_file = wordcloud()
-    # filename = os.path.join(APP_ROOT, 'images/word_cloud_2.png')
-    # dst_file = 'word_cloud.png'
     return render_template('index.html')
 
 @app.route('/<filename>')
