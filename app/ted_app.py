@@ -47,7 +47,7 @@ def wordcloud(index):
     os.system('qlmanage -t -s 500 -o . wordcloud.svg')
     png_file = 'wordcloud.svg.png'
 
-    existing_files = glob.glob('static/*.png')
+    existing_files = glob.glob('images/*.png')
     dst_file = 'images/word_cloud_' + '{:03d}'.format(int(existing_files[-1][-7:-4])+1) + '.png'
 
     shutil.copyfile(png_file, dst_file)
